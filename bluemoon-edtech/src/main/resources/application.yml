@@ -1,0 +1,19 @@
+
+spring:
+  application:
+    name: bluemoon-edtech
+  datasource:
+    url: jdbc:postgresql://localhost:5432/edtech_db
+    username: postgres
+    password: NewStrongPassword123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8081
