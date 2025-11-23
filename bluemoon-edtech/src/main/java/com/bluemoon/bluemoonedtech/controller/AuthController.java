@@ -4,11 +4,14 @@ import com.bluemoon.bluemoonedtech.dto.LoginRequest;
 import com.bluemoon.bluemoonedtech.dto.LoginResponse;
 import com.bluemoon.bluemoonedtech.dto.RegisterRequest;
 import com.bluemoon.bluemoonedtech.dto.UserResponse;
+import com.bluemoon.bluemoonedtech.service.AuthService;
 import com.bluemoon.bluemoonedtech.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.AuthProvider;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -16,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final UserService userService;
-
+    private final AuthService authService;
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
         UserResponse user = userService.register(request);
@@ -25,7 +28,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        LoginResponse response = userService.login(request);
+
+        LoginResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
 

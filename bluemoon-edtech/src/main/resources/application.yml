@@ -15,5 +15,12 @@ spring:
         format_sql: true
 
 
+jwt:
+  secret: manchester_is_always_blue_will_be_blue_and_forever
+  expiration-ms: 86400000 # 1 day in ms
+
+
+
+
 server:
   port: 8081
