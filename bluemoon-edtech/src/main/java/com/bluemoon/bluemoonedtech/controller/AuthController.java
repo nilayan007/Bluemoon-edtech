@@ -1,5 +1,7 @@
 package com.bluemoon.bluemoonedtech.controller;
 
+import com.bluemoon.bluemoonedtech.dto.LoginRequest;
+import com.bluemoon.bluemoonedtech.dto.LoginResponse;
 import com.bluemoon.bluemoonedtech.dto.RegisterRequest;
 import com.bluemoon.bluemoonedtech.dto.UserResponse;
 import com.bluemoon.bluemoonedtech.service.UserService;
@@ -20,4 +22,11 @@ public class AuthController {
         UserResponse user = userService.register(request);
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+        LoginResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
 }

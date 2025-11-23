@@ -1,6 +1,8 @@
 package com.bluemoon.bluemoonedtech.service;
 
 
+import com.bluemoon.bluemoonedtech.dto.LoginRequest;
+import com.bluemoon.bluemoonedtech.dto.LoginResponse;
 import com.bluemoon.bluemoonedtech.dto.RegisterRequest;
 import com.bluemoon.bluemoonedtech.dto.UserResponse;
 import com.bluemoon.bluemoonedtech.entity.User;
@@ -53,4 +55,24 @@ public class UserService {
                 .role(saved.getRole())
                 .build();
     }
+    public LoginResponse login(LoginRequest request) {
+
+        String email = request.getEmail().toLowerCase().trim();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+
+        return LoginResponse.builder()
+                .id(user.getPublicId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .verified(user.getIsVerified())
+                .build();
+    }
+
+
 }
