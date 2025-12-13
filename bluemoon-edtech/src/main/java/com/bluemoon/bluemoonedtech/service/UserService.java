@@ -1,8 +1,6 @@
 package com.bluemoon.bluemoonedtech.service;
 
 
-import com.bluemoon.bluemoonedtech.dto.LoginRequest;
-import com.bluemoon.bluemoonedtech.dto.LoginResponse;
 import com.bluemoon.bluemoonedtech.dto.RegisterRequest;
 import com.bluemoon.bluemoonedtech.dto.UserResponse;
 import com.bluemoon.bluemoonedtech.entity.User;
@@ -10,13 +8,10 @@ import com.bluemoon.bluemoonedtech.entity.UserProfile;
 import com.bluemoon.bluemoonedtech.entity.UserRole;
 import com.bluemoon.bluemoonedtech.repository.UserProfileRepository;
 import com.bluemoon.bluemoonedtech.repository.UserRepository;
-import com.bluemoon.bluemoonedtech.security.JwtService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +20,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
     @Transactional
     public UserResponse register(RegisterRequest request) {
         String email = request.getEmail().toLowerCase().trim();
@@ -42,13 +36,13 @@ public class UserService {
                 .role(UserRole.STUDENT).isVerified(true)
                 .build();
 
-        User saved = userRepository.save(user);
+        User saved = userRepository.saveAndFlush(user);
 
         // create empty profile
         UserProfile profile = UserProfile.builder()
                 .user(saved)
                 .build();
-        profileRepository.save(profile);
+        profileRepository.saveAndFlush(profile);
         saved.setProfile(profile);
 
         return UserResponse.builder()
