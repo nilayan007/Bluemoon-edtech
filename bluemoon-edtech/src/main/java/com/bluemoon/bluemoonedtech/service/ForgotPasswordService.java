@@ -11,6 +11,8 @@ import com.bluemoon.bluemoonedtech.otp.service.OtpService;
 import com.bluemoon.bluemoonedtech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.bluemoon.bluemoonedtech.email.EmailService;
+
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class ForgotPasswordService {
     private final OtpService otpService;
     private final OtpVerificationRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
-    // private final EmailService emailService (later)
+     private final EmailService emailService ;
 
     public void requestOtp(String email) {
 
@@ -32,6 +34,11 @@ public class ForgotPasswordService {
             );
 
             // TEMP: replace with email service later
+            // otp = otpService.generateOtp(email, OtpPurpose.FORGOT_PASSWORD);
+            System.out.println("1️⃣ OTP generated, calling email service");
+
+            emailService.sendOtp(email, otp);
+            System.out.println("2️⃣ Returned from email service");
             System.out.println("Forgot Password OTP for " + email + " = " + otp);
         });
 

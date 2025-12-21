@@ -19,6 +19,9 @@ jwt:
   secret: manchester_is_always_blue_will_be_blue_and_forever
   expiration-ms: 86400000 # 1 day in ms
 
+sendgrid:
+  api-key: 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
+  from-email: nilayansamanta4@gmail.com
 
 
 
