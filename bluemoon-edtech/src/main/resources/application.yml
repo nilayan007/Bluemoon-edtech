@@ -20,7 +20,7 @@ jwt:
   expiration-ms: 86400000 # 1 day in ms
 
 sendgrid:
-  api-key: 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
+  api-key: ${SENDGRID_API_KEY}
   from-email: nilayansamanta4@gmail.com
 
 
