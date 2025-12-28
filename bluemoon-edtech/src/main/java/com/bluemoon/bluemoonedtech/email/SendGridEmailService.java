@@ -11,10 +11,15 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.Mail;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Async
 @Service
 @RequiredArgsConstructor
 public class SendGridEmailService implements EmailService {
+    private static final Logger log =
+            LoggerFactory.getLogger(SendGridEmailService.class);
 
     @Value("${sendgrid.api-key}")
     private String sendGridApiKey;
@@ -24,7 +29,11 @@ public class SendGridEmailService implements EmailService {
 
     @Override
     public void sendOtp(String toEmail, String otp) {
-        System.out.println("3️⃣ Email sending STARTED");
+        log.info("SendGrid sendOtp called for email={}", toEmail);
+        log.info("SendGrid API key loaded = {}", sendGridApiKey);
+
+
+        //System.out.println("3️⃣ Email sending STARTED");
 
         Email from = new Email(fromEmail);
         Email to = new Email(toEmail);
@@ -52,7 +61,12 @@ public class SendGridEmailService implements EmailService {
             request.setMethod(Method.POST);
             request.setEndpoint("mail/send");
             request.setBody(mail.build());
-            sendGrid.api(request);
+            //sendGrid.api(request);
+            Response response = sendGrid.api(request);
+
+            log.info("SendGrid response status={}", response.getStatusCode());
+            log.info("SendGrid response body={}", response.getBody());
+
         } catch (IOException e) {
             throw new RuntimeException("Failed to send OTP email", e);
         }

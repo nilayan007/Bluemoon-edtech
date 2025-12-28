@@ -30,7 +30,9 @@ public class CustomUserDetails implements UserDetails {
     public String getPassword() {
         return user.getPasswordHash();
     }
-
+    public Long getId() {
+        return user.getId();
+    }
 
     @Override
     public String getUsername() {

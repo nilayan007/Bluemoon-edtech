@@ -33,12 +33,11 @@ public class ForgotPasswordService {
                     OtpPurpose.FORGOT_PASSWORD
             );
 
-            // TEMP: replace with email service later
-            // otp = otpService.generateOtp(email, OtpPurpose.FORGOT_PASSWORD);
-            System.out.println("1️⃣ OTP generated, calling email service");
+
+            //System.out.println("1️⃣ OTP generated, calling email service");
 
             emailService.sendOtp(email, otp);
-            System.out.println("2️⃣ Returned from email service");
+            //System.out.println("2️⃣ Returned from email service");
             System.out.println("Forgot Password OTP for " + email + " = " + otp);
         });
 
