@@ -1,5 +1,6 @@
 package com.bluemoon.bluemoonedtech.otp.service;
 
+import com.bluemoon.bluemoonedtech.exception.InvalidOtpException;
 import com.bluemoon.bluemoonedtech.otp.entity.OtpVerification;
 import com.bluemoon.bluemoonedtech.otp.enums.OtpPurpose;
 import com.bluemoon.bluemoonedtech.otp.repository.OtpVerificationRepository;
@@ -36,16 +37,16 @@ public class OtpService {
     public void verifyOtp(String identifier, String otp, OtpPurpose purpose) {
         OtpVerification otpEntity = otpRepository
                 .findTopByIdentifierAndPurposeOrderByCreatedAtDesc(identifier, purpose)
-                .orElseThrow(() -> new RuntimeException("OTP not found"));
+                .orElseThrow(() -> new InvalidOtpException("OTP not found"));
 
         if (otpEntity.isUsed())
-            throw new RuntimeException("OTP already used");
+            throw new InvalidOtpException("OTP already used");
 
         if (otpEntity.getExpiryTime().isBefore(LocalDateTime.now()))
-            throw new RuntimeException("OTP expired");
+            throw new InvalidOtpException("OTP expired");
 
         if (!passwordEncoder.matches(otp, otpEntity.getOtpHash()))
-            throw new RuntimeException("Invalid OTP");
+            throw new InvalidOtpException("Invalid OTP");
 
         otpEntity.setUsed(true);
         otpRepository.save(otpEntity);

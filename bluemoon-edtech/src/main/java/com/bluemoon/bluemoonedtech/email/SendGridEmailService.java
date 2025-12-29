@@ -30,7 +30,7 @@ public class SendGridEmailService implements EmailService {
     @Override
     public void sendOtp(String toEmail, String otp) {
         log.info("SendGrid sendOtp called for email={}", toEmail);
-        log.info("SendGrid API key loaded = {}", sendGridApiKey);
+       // log.info("SendGrid API key loaded = {}", sendGridApiKey);
 
 
         //System.out.println("3️⃣ Email sending STARTED");

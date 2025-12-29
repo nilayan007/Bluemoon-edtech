@@ -44,20 +44,6 @@ public class EmailChangeController {
                 request.getOtp()
         );
 
-        return ResponseEntity.ok("OTP verified successfully");
+        return ResponseEntity.ok("Email changed successfully");
     }
-    @PostMapping("/confirm")
-    public ResponseEntity<String> confirmEmailChange(
-            @AuthenticationPrincipal CustomUserDetails user,
-            @Valid @RequestBody ConfirmEmailChangeRequest request
-    ) {
-        emailChangeService.confirmEmailChange(
-                user.getId(),
-                request.getNewEmail()
-        );
-
-        return ResponseEntity.ok("Email updated successfully");
-    }
-
-
 }

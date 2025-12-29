@@ -22,8 +22,8 @@ public class UserProfileService {
      * Update profile by user's publicId (you can change to use current authenticated user)
      */
     @Transactional
-    public ProfileResponse updateProfile(String userPublicId, UpdateProfileRequest req) {
-        User user = userRepository.findByPublicId(userPublicId)
+    public ProfileResponse updateProfile(Long id, UpdateProfileRequest req) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         UserProfile profile = profileRepository.findByUser(user)
@@ -58,8 +58,8 @@ public class UserProfileService {
                 .build();
     }
 
-    public ProfileResponse getProfile(String userPublicId) {
-        User user = userRepository.findByPublicId(userPublicId)
+    public ProfileResponse getProfile(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         UserProfile profile = profileRepository.findByUser(user)

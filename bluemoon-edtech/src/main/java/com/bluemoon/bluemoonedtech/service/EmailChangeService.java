@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.bluemoon.bluemoonedtech.email.EmailService;
 import com.bluemoon.bluemoonedtech.entity.User;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class EmailChangeService {
         System.out.println("chnage email OTP is" + otp);
 
     }
+    @Transactional
     public void verifyEmailChangeOtp(Long userId, String newEmail, String otp) {
 
         otpService.verifyOtp(
@@ -40,6 +42,10 @@ public class EmailChangeService {
                 otp,
                 OtpPurpose.EMAIL_CHANGE
         );
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setEmail(newEmail);
+        userRepository.save(user);
 
     }
 
