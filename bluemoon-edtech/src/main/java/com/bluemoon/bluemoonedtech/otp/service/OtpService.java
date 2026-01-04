@@ -25,7 +25,7 @@ public class OtpService {
                 .identifier(identifier)
                 .otpHash(passwordEncoder.encode(otp))
                 .purpose(purpose)
-                .expiryTime(LocalDateTime.now().plusMinutes(10))
+                .expiryTime(LocalDateTime.now().plusMinutes(5))
                 .used(false)
                 .createdAt(LocalDateTime.now())
                 .build();
