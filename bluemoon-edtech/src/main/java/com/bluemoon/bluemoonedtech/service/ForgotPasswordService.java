@@ -12,6 +12,7 @@ import com.bluemoon.bluemoonedtech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.bluemoon.bluemoonedtech.email.EmailService;
+import com.bluemoon.bluemoonedtech.refresh.service.RefreshTokenService;
 
 
 @Service
@@ -22,7 +23,8 @@ public class ForgotPasswordService {
     private final OtpService otpService;
     private final OtpVerificationRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
-     private final EmailService emailService ;
+    private final EmailService emailService ;
+    private final RefreshTokenService refreshTokenService;
 
     public void requestOtp(String email) {
 
@@ -76,6 +78,8 @@ public class ForgotPasswordService {
 
         // OPTIONAL (add later)
         // jwtInvalidationService.invalidateUserTokens(user.getId());
+        refreshTokenService.revokeAllForUser(user);
+
     }
 
 }

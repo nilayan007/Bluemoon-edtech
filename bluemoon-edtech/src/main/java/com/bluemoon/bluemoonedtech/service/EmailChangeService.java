@@ -1,6 +1,7 @@
 package com.bluemoon.bluemoonedtech.service;
 import com.bluemoon.bluemoonedtech.otp.enums.OtpPurpose;
 import com.bluemoon.bluemoonedtech.otp.service.OtpService;
+import com.bluemoon.bluemoonedtech.refresh.service.RefreshTokenService;
 import com.bluemoon.bluemoonedtech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ public class EmailChangeService {
     private final UserRepository userRepository;
     private final OtpService otpService;
     private final EmailService emailService;
+    private final RefreshTokenService refreshTokenService;
+
 
     public void requestEmailChange(Long userId, String newEmail) {
 
@@ -58,6 +61,9 @@ public class EmailChangeService {
         user.setEmail(newEmail);
 
         userRepository.save(user);
+        refreshTokenService.revokeAllForUser(user);
+
+
 
     }
 

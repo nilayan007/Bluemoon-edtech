@@ -44,6 +44,6 @@ public class EmailChangeController {
                 request.getOtp()
         );
 
-        return ResponseEntity.ok("Email changed successfully");
+        return ResponseEntity.ok("Email changed successfully!! Please login again");
     }
 }

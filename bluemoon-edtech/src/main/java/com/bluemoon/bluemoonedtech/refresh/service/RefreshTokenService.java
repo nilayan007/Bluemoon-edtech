@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final RefreshTokenRepository repository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public RefreshToken create(User user) {
         RefreshToken token = RefreshToken.builder()
@@ -25,11 +25,11 @@ public class RefreshTokenService {
                 .revoked(false)
                 .build();
 
-        return repository.save(token);
+        return refreshTokenRepository.save(token);
     }
 
     public RefreshToken validate(String token) {
-        RefreshToken refreshToken = repository.findByToken(token)
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
 
         if (refreshToken.isRevoked())
@@ -42,17 +42,21 @@ public class RefreshTokenService {
     }
     public void logout(String refreshTokenValue) {
 
-        RefreshToken refreshToken = repository.findByToken(refreshTokenValue)
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenValue)
                 .orElseThrow(() -> new InvalidTokenException("Invalid refresh token"));
 
         refreshToken.setRevoked(true); // OR delete
-        repository.save(refreshToken);
+        refreshTokenRepository.save(refreshToken);
     }
 
 
     public void revoke(RefreshToken token) {
         token.setRevoked(true);
-        repository.save(token);
+        refreshTokenRepository.save(token);
     }
+    public void revokeAllForUser(User user) {
+        refreshTokenRepository.deleteByUser(user);
+    }
+
 }
 

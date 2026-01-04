@@ -70,7 +70,7 @@ public class AuthController {
                 request.getNewPassword()
         );
 
-        return ResponseEntity.ok("Password reset successful");
+        return ResponseEntity.ok("Password reset successfully, Please login again");
     }
 
     @PostMapping("/refresh")
