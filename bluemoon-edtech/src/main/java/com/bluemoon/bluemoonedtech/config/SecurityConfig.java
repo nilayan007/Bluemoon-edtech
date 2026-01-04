@@ -36,8 +36,8 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health", "/api/auth/register", "/api/auth/login","api/auth/forgot-password",
-                                "api/auth/verify-forgot-otp","api/auth/reset-password").permitAll()
+                        .requestMatchers("/api/health", "/api/auth/register", "/api/auth/login","/api/auth/forgot-password",
+                                "/api/auth/verify-forgot-otp","/api/auth/reset-password", "/api/auth/refresh","/api/auth/logout").permitAll()
                         .anyRequest().authenticated()
                 );
 

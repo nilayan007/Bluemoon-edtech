@@ -1,10 +1,15 @@
 package com.bluemoon.bluemoonedtech.controller;
 
 import com.bluemoon.bluemoonedtech.dto.*;
+import com.bluemoon.bluemoonedtech.refresh.dto.LogoutRequest;
+import com.bluemoon.bluemoonedtech.refresh.dto.RefreshTokenRequest;
+import com.bluemoon.bluemoonedtech.refresh.entity.RefreshToken;
+import com.bluemoon.bluemoonedtech.refresh.service.RefreshTokenService;
 import com.bluemoon.bluemoonedtech.service.AuthService;
 import com.bluemoon.bluemoonedtech.service.ForgotPasswordService;
 import com.bluemoon.bluemoonedtech.service.UserService;
 import jakarta.validation.Valid;
+import com.bluemoon.bluemoonedtech.dto.AccessTokenResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +24,8 @@ public class AuthController {
     private final UserService userService;
     private final AuthService authService;
     private final ForgotPasswordService forgotPasswordService;
+   // private final RefreshTokenService refreshTokenService;
+
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -65,5 +72,25 @@ public class AuthController {
 
         return ResponseEntity.ok("Password reset successful");
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AccessTokenResponse> refresh(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        return ResponseEntity.ok(
+                authService.refresh(request.getRefreshToken())
+        );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @Valid @RequestBody LogoutRequest request
+    ) {
+        authService.logout(request.getRefreshToken());
+        return ResponseEntity.ok().build();
+    }
+
+
+
 
 }
