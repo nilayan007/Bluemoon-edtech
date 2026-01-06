@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Random;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtpService {
@@ -19,6 +20,7 @@ public class OtpService {
     private final PasswordEncoder passwordEncoder;
 
     public String generateOtp(String identifier, OtpPurpose purpose) {
+        log.info("OTP generation started for purpose {}", purpose);
         String otp = String.format("%06d", new Random().nextInt(999999));
 
         OtpVerification otpEntity = OtpVerification.builder()
@@ -31,24 +33,36 @@ public class OtpService {
                 .build();
 
         otpRepository.save(otpEntity);
+        log.info("OTP generated successfully for purpose {}", purpose);
         return otp; // send via email later
     }
 
     public void verifyOtp(String identifier, String otp, OtpPurpose purpose) {
+        log.info("Verifying OTP for purpose {}", purpose);
         OtpVerification otpEntity = otpRepository
                 .findTopByIdentifierAndPurposeOrderByCreatedAtDesc(identifier, purpose)
-                .orElseThrow(() -> new InvalidOtpException("OTP not found"));
+                .orElseThrow(() -> {
+                    log.warn("OTP verification failed: OTP not found");
+                    return new InvalidOtpException("OTP not found");
+                });
 
-        if (otpEntity.isUsed())
+        if (otpEntity.isUsed()) {
+            log.warn("OTP verification failed: OTP already used");
             throw new InvalidOtpException("OTP already used");
+        }
 
-        if (otpEntity.getExpiryTime().isBefore(LocalDateTime.now()))
+        if (otpEntity.getExpiryTime().isBefore(LocalDateTime.now())) {
+            log.warn("OTP verification failed: OTP expired");
             throw new InvalidOtpException("OTP expired");
+        }
 
-        if (!passwordEncoder.matches(otp, otpEntity.getOtpHash()))
+        if (!passwordEncoder.matches(otp, otpEntity.getOtpHash())) {
+            log.warn("OTP verification failed: OTP mismatch");
             throw new InvalidOtpException("Invalid OTP");
+        }
 
         otpEntity.setUsed(true);
         otpRepository.save(otpEntity);
+        log.info("OTP verified successfully for purpose {}", purpose);
     }
 }

@@ -12,7 +12,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -22,9 +23,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     @Transactional
     public UserResponse register(RegisterRequest request) {
+        log.info("User registration initiated");
         String email = request.getEmail().toLowerCase().trim();
 
         if (userRepository.existsByEmail(email)) {
+            log.warn("User registration failed: email already registered");
             throw new IllegalArgumentException("Email already registered");
         }
 
@@ -44,6 +47,7 @@ public class UserService {
                 .build();
         profileRepository.saveAndFlush(profile);
         saved.setProfile(profile);
+        log.info("User registered successfully");
 
         return UserResponse.builder()
                 .id(saved.getPublicId())
