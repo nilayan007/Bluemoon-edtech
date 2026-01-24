@@ -2,7 +2,8 @@ package com.bluemoon.bluemoonedtech.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.time.LocalDateTime;
 
 @Entity
@@ -36,4 +37,12 @@ public class Course {
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+    @OneToMany(
+            mappedBy = "course",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("orderIndex ASC")
+    private List<Lesson> lessons = new ArrayList<>();
+
 }
