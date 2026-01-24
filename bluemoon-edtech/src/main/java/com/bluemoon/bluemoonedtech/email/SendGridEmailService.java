@@ -11,15 +11,15 @@ import com.sendgrid.helpers.mail.objects.Email;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.Mail;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Async
 @Service
 @RequiredArgsConstructor
 public class SendGridEmailService implements EmailService {
-    private static final Logger log =
-            LoggerFactory.getLogger(SendGridEmailService.class);
+
 
     @Value("${sendgrid.api-key}")
     private String sendGridApiKey;
@@ -29,8 +29,8 @@ public class SendGridEmailService implements EmailService {
 
     @Override
     public void sendOtp(String toEmail, String otp) {
-        log.info("SendGrid sendOtp called for email={}", toEmail);
-       // log.info("SendGrid API key loaded = {}", sendGridApiKey);
+        log.info("Sending OTP email via SendGrid");
+
 
 
         //System.out.println("3️⃣ Email sending STARTED");
@@ -64,10 +64,16 @@ public class SendGridEmailService implements EmailService {
             //sendGrid.api(request);
             Response response = sendGrid.api(request);
 
-            log.info("SendGrid response status={}", response.getStatusCode());
-            log.info("SendGrid response body={}", response.getBody());
+            if (response.getStatusCode() >= 200 && response.getStatusCode() < 300) {
+                log.info("OTP email sent successfully");
+            } else {
+                log.error("SendGrid returned non-success status: {}", response.getStatusCode());
+                throw new RuntimeException("Email delivery failed");
+            }
+
 
         } catch (IOException e) {
+            log.error("Failed to send OTP email via SendGrid", e);
             throw new RuntimeException("Failed to send OTP email", e);
         }
     }

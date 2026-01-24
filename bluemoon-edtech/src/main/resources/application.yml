@@ -12,7 +12,7 @@ spring:
     show-sql: true         # <-- prints SQL to logs
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
 
 
 jwt:
@@ -23,6 +23,9 @@ sendgrid:
   api-key: ${SENDGRID_API_KEY}
   from-email: nilayansamanta4@gmail.com
 
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%X{userId}] %-5level %logger{36} - %msg%n"
 
 
 server:

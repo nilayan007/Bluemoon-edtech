@@ -13,8 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.bluemoon.bluemoonedtech.email.EmailService;
 import com.bluemoon.bluemoonedtech.refresh.service.RefreshTokenService;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ForgotPasswordService {
@@ -27,6 +28,7 @@ public class ForgotPasswordService {
     private final RefreshTokenService refreshTokenService;
 
     public void requestOtp(String email) {
+        log.info("Forgot password OTP request received");
 
         // SECURITY: do not reveal user existence
         userRepository.findByEmail(email).ifPresent(user -> {
@@ -36,21 +38,24 @@ public class ForgotPasswordService {
             );
 
 
-            //System.out.println("1️⃣ OTP generated, calling email service");
+
 
             emailService.sendOtp(email, otp);
-            //System.out.println("2️⃣ Returned from email service");
+
             System.out.println("Forgot Password OTP for " + email + " = " + otp);
+            log.info("Forgot password OTP sent successfully");
         });
 
         // Always return success
     }
     public void verifyOtp(String email, String otp) {
+        log.info("Verifying forgot password OTP");
         otpService.verifyOtp(
                 email,
                 otp,
                 OtpPurpose.FORGOT_PASSWORD
         );
+        log.info("Forgot password OTP verified successfully");
     }
     public void resetPassword(String email, String newPassword) {
 
@@ -63,6 +68,7 @@ public class ForgotPasswordService {
                 .orElseThrow(() -> new RuntimeException("OTP not verified"));
 
         if (!otp.isUsed()) {
+            log.warn("Reset password failed: OTP not verified");
             throw new RuntimeException("OTP not verified");
         }
 
@@ -79,6 +85,7 @@ public class ForgotPasswordService {
         // OPTIONAL (add later)
         // jwtInvalidationService.invalidateUserTokens(user.getId());
         refreshTokenService.revokeAllForUser(user);
+        log.info("Password reset successfully and user sessions revoked");
 
     }
 

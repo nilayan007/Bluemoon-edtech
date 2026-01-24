@@ -10,7 +10,8 @@ import com.bluemoon.bluemoonedtech.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
@@ -23,8 +24,12 @@ public class UserProfileService {
      */
     @Transactional
     public ProfileResponse updateProfile(Long id, UpdateProfileRequest req) {
+        log.info("User profile update initiated");
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    log.warn("Profile update failed: profile not found");
+                    return new ResourceNotFoundException("Profile not found");
+                });
 
         UserProfile profile = profileRepository.findByUser(user)
                 .orElseGet(() -> {
@@ -43,6 +48,7 @@ public class UserProfileService {
         if (req.getProfileImageUrl() != null) profile.setProfileImageUrl(req.getProfileImageUrl());
 
         UserProfile saved = profileRepository.save(profile);
+        log.info("User profile updated successfully");
 
         return ProfileResponse.builder()
                 .userPublicId(user.getPublicId())

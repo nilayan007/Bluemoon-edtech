@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import com.bluemoon.bluemoonedtech.email.EmailService;
 import com.bluemoon.bluemoonedtech.entity.User;
 import org.springframework.transaction.annotation.Transactional;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailChangeService {
@@ -21,8 +22,10 @@ public class EmailChangeService {
 
     public void requestEmailChange(Long userId, String newEmail) {
 
-        // 1. Check if new email already exists
+        log.info("Email change request initiated");
+
         if (userRepository.existsByEmail(newEmail)) {
+            log.warn("Email change failed: email already in use");
             throw new RuntimeException("Email already in use");
         }
 
@@ -35,10 +38,13 @@ public class EmailChangeService {
         // 3. Send OTP to NEW email (async)
         emailService.sendOtp(newEmail, otp);
         System.out.println("chnage email OTP is" + otp);
+        log.info("Email change OTP sent successfully");
 
     }
     @Transactional
     public void verifyEmailChangeOtp(Long userId, String newEmail, String otp) {
+        log.info("Verifying email change OTP");
+
 
         otpService.verifyOtp(
                 newEmail,
@@ -49,11 +55,12 @@ public class EmailChangeService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setEmail(newEmail);
         userRepository.save(user);
+        log.info("Email change OTP is successfully verified");
 
     }
 
     public void confirmEmailChange(Long userId, String newEmail) {
-
+        log.info("Confirming email change");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -62,6 +69,7 @@ public class EmailChangeService {
 
         userRepository.save(user);
         refreshTokenService.revokeAllForUser(user);
+        log.info("Email change confirmed and user sessions revoked");
 
 
 
