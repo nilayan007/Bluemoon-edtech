@@ -6,6 +6,7 @@ import com.bluemoon.bluemoonedtech.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -36,18 +37,39 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health", "/api/auth/register", "/api/auth/login","/api/auth/forgot-password",
-                                "/api/auth/verify-forgot-otp","/api/auth/reset-password", "/api/auth/refresh","/api/auth/logout").permitAll()
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        // Public auth & health APIs
+                        .requestMatchers(
+                                "/api/health",
+                                "/api/auth/register",
+                                "/api/auth/login",
+                                "/api/auth/forgot-password",
+                                "/api/auth/verify-forgot-otp",
+                                "/api/auth/reset-password",
+                                "/api/auth/refresh",
+                                "/api/auth/logout"
+                        ).permitAll()
+
+                        // Public course APIs (GET only)
+                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
+
+                        // Admin-only APIs
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // Everything else
                         .anyRequest().authenticated()
                 );
-
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-
         return http.build();
     }
+
 
 
     @Bean

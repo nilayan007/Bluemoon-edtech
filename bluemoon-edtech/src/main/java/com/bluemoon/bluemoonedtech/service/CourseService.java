@@ -49,4 +49,22 @@ public class CourseService {
 
         return courseRepository.save(course);
     }
+    public Course publishCourse(Long courseId) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        course.setPublished(true);
+        return courseRepository.save(course);
+    }
+
+    public Course unpublishCourse(Long courseId) {
+
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        course.setPublished(false);
+        return courseRepository.save(course);
+    }
+
 }

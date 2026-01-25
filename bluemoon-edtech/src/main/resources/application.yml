@@ -30,3 +30,7 @@ logging:
 
 server:
   port: 8081
+admin:
+  email: ${ADMIN_EMAIL}
+  password: ${ADMIN_PASSWORD}
+  name:  ${ADMIN_NAME}

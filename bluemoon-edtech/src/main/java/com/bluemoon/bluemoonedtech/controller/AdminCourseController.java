@@ -33,5 +33,17 @@ public class AdminCourseController {
             @RequestBody UpdateCourseRequest request) {
         return ResponseEntity.ok(courseService.updateCourse(courseId, request));
     }
+    @PutMapping("/{courseId}/publish")
+    public ResponseEntity<Course> publishCourse(
+            @PathVariable Long courseId) {
+        return ResponseEntity.ok(courseService.publishCourse(courseId));
+    }
+
+    @PutMapping("/{courseId}/unpublish")
+    public ResponseEntity<Course> unpublishCourse(
+            @PathVariable Long courseId) {
+        return ResponseEntity.ok(courseService.unpublishCourse(courseId));
+    }
+
 
 }
