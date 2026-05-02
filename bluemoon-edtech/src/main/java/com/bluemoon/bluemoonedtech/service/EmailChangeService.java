@@ -1,5 +1,8 @@
 package com.bluemoon.bluemoonedtech.service;
+import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
+import com.bluemoon.bluemoonedtech.otp.entity.OtpVerification;
 import com.bluemoon.bluemoonedtech.otp.enums.OtpPurpose;
+import com.bluemoon.bluemoonedtech.otp.repository.OtpVerificationRepository;
 import com.bluemoon.bluemoonedtech.otp.service.OtpService;
 import com.bluemoon.bluemoonedtech.refresh.service.RefreshTokenService;
 import com.bluemoon.bluemoonedtech.repository.UserRepository;
@@ -18,6 +21,7 @@ public class EmailChangeService {
     private final OtpService otpService;
     private final EmailService emailService;
     private final RefreshTokenService refreshTokenService;
+    private final OtpVerificationRepository otpRepository;
 
 
     public void requestEmailChange(Long userId, String newEmail) {
@@ -45,32 +49,39 @@ public class EmailChangeService {
     public void verifyEmailChangeOtp(Long userId, String newEmail, String otp) {
         log.info("Verifying email change OTP");
 
-
         otpService.verifyOtp(
                 newEmail,
                 otp,
                 OtpPurpose.EMAIL_CHANGE
         );
+        //log.info("Email change OTP verified successfully");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        user.setEmail(newEmail);
-        userRepository.save(user);
         log.info("Email change OTP is successfully verified");
 
-    }
-
-    public void confirmEmailChange(Long userId, String newEmail) {
         log.info("Confirming email change");
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        OtpVerification otp1 = otpRepository
+                .findTopByIdentifierAndPurposeOrderByCreatedAtDesc(
+                        newEmail,
+                        OtpPurpose.EMAIL_CHANGE
+                )
+                .orElseThrow(() -> new RuntimeException("OTP not verified"));
 
         // Update email
+
         user.setEmail(newEmail);
 
         userRepository.save(user);
         refreshTokenService.revokeAllForUser(user);
+        otpRepository.delete(otp1);
+
         log.info("Email change confirmed and user sessions revoked");
 
+
+
+    }
+
+    public void confirmEmailChange(Long userId, String newEmail) {
 
 
     }

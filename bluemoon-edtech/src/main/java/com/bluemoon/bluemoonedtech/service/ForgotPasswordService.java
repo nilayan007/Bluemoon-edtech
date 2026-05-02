@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.bluemoon.bluemoonedtech.email.EmailService;
 import com.bluemoon.bluemoonedtech.refresh.service.RefreshTokenService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -39,7 +40,6 @@ public class ForgotPasswordService {
 
 
 
-
             emailService.sendOtp(email, otp);
 
             System.out.println("Forgot Password OTP for " + email + " = " + otp);
@@ -57,6 +57,7 @@ public class ForgotPasswordService {
         );
         log.info("Forgot password OTP verified successfully");
     }
+    @Transactional
     public void resetPassword(String email, String newPassword) {
 
         // ensure OTP was verified
