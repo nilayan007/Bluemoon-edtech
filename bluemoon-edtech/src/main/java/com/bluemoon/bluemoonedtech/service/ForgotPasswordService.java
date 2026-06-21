@@ -3,6 +3,7 @@ package com.bluemoon.bluemoonedtech.service;
 //package com.bluemoon.bluemoonedtech.auth.service;
 import com.bluemoon.bluemoonedtech.entity.User;
 import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
+import com.bluemoon.bluemoonedtech.exception.InvalidOtpException;
 import com.bluemoon.bluemoonedtech.otp.entity.OtpVerification;
 import com.bluemoon.bluemoonedtech.otp.repository.OtpVerificationRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -66,11 +67,11 @@ public class ForgotPasswordService {
                         email,
                         OtpPurpose.FORGOT_PASSWORD
                 )
-                .orElseThrow(() -> new RuntimeException("OTP not verified"));
+                .orElseThrow(() -> new InvalidOtpException("OTP not verified"));
 
         if (!otp.isUsed()) {
             log.warn("Reset password failed: OTP not verified");
-            throw new RuntimeException("OTP not verified");
+            throw new InvalidOtpException("OTP not verified");
         }
 
         User user = userRepository.findByEmail(email)

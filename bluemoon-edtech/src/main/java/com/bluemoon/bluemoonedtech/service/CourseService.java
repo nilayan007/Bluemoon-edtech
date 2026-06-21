@@ -4,6 +4,7 @@ import com.bluemoon.bluemoonedtech.dto.CourseResponseDTO;
 import com.bluemoon.bluemoonedtech.dto.CreateCourseRequest;
 import com.bluemoon.bluemoonedtech.dto.UpdateCourseRequest;
 import com.bluemoon.bluemoonedtech.entity.Course;
+import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
 import com.bluemoon.bluemoonedtech.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class CourseService {
     // Get course by ID
     public CourseResponseDTO getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         return mapToDTO(course);
     }
@@ -50,7 +51,7 @@ public class CourseService {
     // Update course
     public CourseResponseDTO updateCourse(Long courseId, UpdateCourseRequest request) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (request.getTitle() != null) {
             course.setTitle(request.getTitle());
@@ -72,7 +73,7 @@ public class CourseService {
     // Delete course
     public void deleteCourse(Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         courseRepository.delete(course);
     }
@@ -80,7 +81,7 @@ public class CourseService {
     // Publish
     public CourseResponseDTO publishCourse(Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         course.setPublished(true);
         return mapToDTO(courseRepository.save(course));
@@ -89,7 +90,7 @@ public class CourseService {
     // Unpublish
     public CourseResponseDTO unpublishCourse(Long courseId) {
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         course.setPublished(false);
         return mapToDTO(courseRepository.save(course));
@@ -102,6 +103,7 @@ public class CourseService {
                 .title(course.getTitle())
                 .description(course.getDescription())
                 .thumbnailUrl(course.getThumbnailUrl())
+                .published(course.isPublished())
                 .build();
     }
 }

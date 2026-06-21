@@ -5,11 +5,11 @@ import com.bluemoon.bluemoonedtech.dto.LessonResponseDTO;
 import com.bluemoon.bluemoonedtech.dto.UpdateLessonRequest;
 import com.bluemoon.bluemoonedtech.entity.Course;
 import com.bluemoon.bluemoonedtech.entity.Lesson;
+import com.bluemoon.bluemoonedtech.exception.ConflictException;
+import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
 import com.bluemoon.bluemoonedtech.repository.CourseRepository;
 import com.bluemoon.bluemoonedtech.repository.LessonRepository;
-import com.bluemoon.bluemoonedtech.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,6 @@ public class LessonService {
 
     private final CourseRepository courseRepository;
     private final LessonRepository lessonRepository;
-    private final EnrollmentService enrollmentService;
 
     // Add Lesson
     public LessonResponseDTO addLesson(Long courseId, AddLessonRequest request) {
@@ -32,14 +31,14 @@ public class LessonService {
         }
 
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         boolean orderIndexExists =
                 lessonRepository.existsByCourseIdAndOrderIndex(
                         courseId, request.getOrderIndex());
 
         if (orderIndexExists) {
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                     "Lesson with orderIndex " + request.getOrderIndex()
                             + " already exists in this course");
         }
@@ -58,7 +57,7 @@ public class LessonService {
     // Delete Lesson
     public void deleteLesson(Long lessonId) {
         Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
         lessonRepository.delete(lesson);
     }
@@ -67,7 +66,7 @@ public class LessonService {
     public LessonResponseDTO updateLesson(Long lessonId, UpdateLessonRequest request) {
 
         Lesson lesson = lessonRepository.findById(lessonId)
-                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 
         if (request.getOrderIndex() != null) {
 
@@ -82,7 +81,7 @@ public class LessonService {
                     );
 
             if (exists && request.getOrderIndex() != lesson.getOrderIndex()) {
-                throw new IllegalArgumentException(
+                throw new ConflictException(
                         "Lesson with this orderIndex already exists in this course"
                 );
             }
@@ -104,13 +103,8 @@ public class LessonService {
 
     // Get lessons by course
     public List<LessonResponseDTO> getLessonsByCourse(Long courseId) {
-
-        Long userId = getCurrentUserId(); // from JWT
-
-        boolean hasAccess = enrollmentService.hasActiveEnrollment(userId, courseId);
-
-        if (!hasAccess) {
-            throw new RuntimeException("Access denied");
+        if (!courseRepository.existsById(courseId)) {
+            throw new ResourceNotFoundException("Course not found");
         }
 
         List<Lesson> lessons = lessonRepository
@@ -129,12 +123,5 @@ public class LessonService {
                 .videoUrl(lesson.getVideoUrl())
                 .orderIndex(lesson.getOrderIndex())
                 .build();
-    }
-    private Long getCurrentUserId() {
-        return ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal())
-                .getId();
     }
 }

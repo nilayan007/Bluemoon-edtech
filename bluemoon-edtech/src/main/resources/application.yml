@@ -17,7 +17,7 @@ spring:
 
 jwt:
   secret: manchester_is_always_blue_will_be_blue_and_forever
-  expiration-ms: 900000  # 1 day in ms
+  expiration-ms: 900000  # 15 minutes
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY}

@@ -2,6 +2,8 @@ package com.bluemoon.bluemoonedtech.service;
 
 import com.bluemoon.bluemoonedtech.dto.LessonResponseDTO;
 import com.bluemoon.bluemoonedtech.entity.Course;
+import com.bluemoon.bluemoonedtech.exception.ForbiddenException;
+import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
 import com.bluemoon.bluemoonedtech.repository.CourseRepository;
 import com.bluemoon.bluemoonedtech.repository.LessonRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +17,21 @@ public class PublicLessonService {
 
     private final LessonRepository lessonRepository;
     private final CourseRepository courseRepository;
+    private final EnrollmentService enrollmentService;
 
-    public List<LessonResponseDTO> getLessonsByCourse(Long courseId) {
+    public List<LessonResponseDTO> getLessonsByCourse(Long courseId, Long userId) {
 
         // 1 Fetch course
         Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         // 2️ Check published status
         if (!course.isPublished()) {
-            throw new RuntimeException("Course not published");
+            throw new ResourceNotFoundException("Course not found");
+        }
+
+        if (!enrollmentService.hasActiveEnrollment(userId, courseId)) {
+            throw new ForbiddenException("Active enrollment required");
         }
 
         // 3️ Fetch lessons only if course is published

@@ -48,8 +48,9 @@ public class SecurityConfig {
 
                 .requestMatchers("/api/health").permitAll()
 
-                // Public courses
-                .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
+                // Public course metadata only. Lesson content requires authentication.
+                .requestMatchers(HttpMethod.GET, "/courses", "/courses/*").permitAll()
+                .requestMatchers(HttpMethod.GET, "/courses/*/lessons").authenticated()
 
                 // User APIs
                 .requestMatchers("/user/**").authenticated()

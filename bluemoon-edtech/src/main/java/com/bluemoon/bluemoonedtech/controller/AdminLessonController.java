@@ -4,6 +4,7 @@ import com.bluemoon.bluemoonedtech.dto.AddLessonRequest;
 import com.bluemoon.bluemoonedtech.dto.LessonResponseDTO;
 import com.bluemoon.bluemoonedtech.dto.UpdateLessonRequest;
 import com.bluemoon.bluemoonedtech.service.LessonService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class AdminLessonController {
     @PostMapping("/courses/{courseId}/lessons")
     public ResponseEntity<LessonResponseDTO> addLesson(
             @PathVariable Long courseId,
-            @RequestBody AddLessonRequest request) {
+            @Valid @RequestBody AddLessonRequest request) {
         return ResponseEntity.ok(lessonService.addLesson(courseId, request));
     }
 
@@ -44,7 +45,7 @@ public class AdminLessonController {
     @PutMapping("/lessons/{lessonId}")
     public ResponseEntity<LessonResponseDTO> updateLesson(
             @PathVariable Long lessonId,
-            @RequestBody UpdateLessonRequest request) {
+            @Valid @RequestBody UpdateLessonRequest request) {
         return ResponseEntity.ok(lessonService.updateLesson(lessonId, request));
     }
 }

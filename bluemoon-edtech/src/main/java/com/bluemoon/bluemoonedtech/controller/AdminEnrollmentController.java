@@ -1,8 +1,6 @@
 package com.bluemoon.bluemoonedtech.controller;
 
-import com.bluemoon.bluemoonedtech.entity.Enrollment;
-import com.bluemoon.bluemoonedtech.enums.EnrollmentStatus;
-import com.bluemoon.bluemoonedtech.repository.EnrollmentRepository;
+import com.bluemoon.bluemoonedtech.dto.EnrollmentResponseDTO;
 import com.bluemoon.bluemoonedtech.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,14 +14,11 @@ import java.util.List;
 public class AdminEnrollmentController {
 
     private final EnrollmentService enrollmentService;
-    private final EnrollmentRepository enrollmentRepository;
 
     //  Get all pending requests
     @GetMapping("/pending")
-    public ResponseEntity<List<Enrollment>> getPendingRequests() {
-        return ResponseEntity.ok(
-                enrollmentRepository.findByStatus(EnrollmentStatus.PENDING)
-        );
+    public ResponseEntity<List<EnrollmentResponseDTO>> getPendingRequests() {
+        return ResponseEntity.ok(enrollmentService.getPendingEnrollments());
     }
 
     //  Approve enrollment

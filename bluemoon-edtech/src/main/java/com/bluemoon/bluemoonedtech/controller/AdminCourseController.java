@@ -4,6 +4,7 @@ import com.bluemoon.bluemoonedtech.dto.CourseResponseDTO;
 import com.bluemoon.bluemoonedtech.dto.CreateCourseRequest;
 import com.bluemoon.bluemoonedtech.dto.UpdateCourseRequest;
 import com.bluemoon.bluemoonedtech.service.CourseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class AdminCourseController {
     // Create Course
     @PostMapping
     public ResponseEntity<CourseResponseDTO> createCourse(
-            @RequestBody CreateCourseRequest request) {
+            @Valid @RequestBody CreateCourseRequest request) {
         return ResponseEntity.ok(courseService.createCourse(request));
     }
 
@@ -41,7 +42,7 @@ public class AdminCourseController {
     @PutMapping("/{courseId}")
     public ResponseEntity<CourseResponseDTO> updateCourse(
             @PathVariable Long courseId,
-            @RequestBody UpdateCourseRequest request) {
+            @Valid @RequestBody UpdateCourseRequest request) {
         return ResponseEntity.ok(courseService.updateCourse(courseId, request));
     }
 

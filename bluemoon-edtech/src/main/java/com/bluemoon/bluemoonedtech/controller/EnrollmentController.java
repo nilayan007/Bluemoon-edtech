@@ -1,6 +1,6 @@
 package com.bluemoon.bluemoonedtech.controller;
 
-import com.bluemoon.bluemoonedtech.entity.Course;
+import com.bluemoon.bluemoonedtech.dto.CourseResponseDTO;
 import com.bluemoon.bluemoonedtech.security.CustomUserDetails;
 import com.bluemoon.bluemoonedtech.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class EnrollmentController {
 
     // My Courses
     @GetMapping("/my-courses")
-    public ResponseEntity<List<Course>> getMyCourses() {
+    public ResponseEntity<List<CourseResponseDTO>> getMyCourses() {
 
         Long userId = getCurrentUserId();
 

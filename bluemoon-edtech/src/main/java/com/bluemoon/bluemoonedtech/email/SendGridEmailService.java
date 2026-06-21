@@ -42,7 +42,7 @@ public class SendGridEmailService implements EmailService {
         Content content = new Content(
                 "text/plain",
                 "Your OTP is: " + otp +
-                        "\n\nThis OTP is valid for 10 minutes." +
+                        "\n\nThis OTP is valid for 5 minutes." +
                         "\nIf you didn’t request this, please ignore."
         );
 

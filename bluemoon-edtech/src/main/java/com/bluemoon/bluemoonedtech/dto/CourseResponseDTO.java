@@ -10,4 +10,5 @@ public class CourseResponseDTO {
     private String title;
     private String description;
     private String thumbnailUrl;
+    private boolean published;
 }

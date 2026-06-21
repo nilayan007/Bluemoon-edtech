@@ -1,6 +1,7 @@
 package com.bluemoon.bluemoonedtech.dto;
 
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class UpdateProfileRequest {
     private String college;
+    @Positive
     private Integer year;
     private String stream;
 

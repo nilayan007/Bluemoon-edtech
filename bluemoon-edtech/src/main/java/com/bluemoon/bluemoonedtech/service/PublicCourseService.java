@@ -2,6 +2,7 @@ package com.bluemoon.bluemoonedtech.service;
 
 import com.bluemoon.bluemoonedtech.dto.CourseResponseDTO;
 import com.bluemoon.bluemoonedtech.entity.Course;
+import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
 import com.bluemoon.bluemoonedtech.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class PublicCourseService {
                         .title(course.getTitle())
                         .description(course.getDescription())
                         .thumbnailUrl(course.getThumbnailUrl())
+                        .published(course.isPublished())
                         .build())
                 .toList();
     }
@@ -30,13 +32,14 @@ public class PublicCourseService {
     public CourseResponseDTO getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .filter(Course::isPublished)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         return CourseResponseDTO.builder()
                 .id(course.getId())
                 .title(course.getTitle())
                 .description(course.getDescription())
                 .thumbnailUrl(course.getThumbnailUrl())
+                .published(course.isPublished())
                 .build();
     }
 }

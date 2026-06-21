@@ -28,6 +28,7 @@ public class Course {
     private String thumbnailUrl;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean published = false;
 
     @Column(nullable = false, updatable = false)
@@ -43,6 +44,7 @@ public class Course {
             orphanRemoval = true
     )
     @OrderBy("orderIndex ASC")
+    @Builder.Default
     private List<Lesson> lessons = new ArrayList<>();
 
 }

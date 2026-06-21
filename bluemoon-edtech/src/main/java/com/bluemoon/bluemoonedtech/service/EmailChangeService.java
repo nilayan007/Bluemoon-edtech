@@ -1,5 +1,7 @@
 package com.bluemoon.bluemoonedtech.service;
 import com.bluemoon.bluemoonedtech.exception.ResourceNotFoundException;
+import com.bluemoon.bluemoonedtech.exception.ConflictException;
+import com.bluemoon.bluemoonedtech.exception.InvalidOtpException;
 import com.bluemoon.bluemoonedtech.otp.entity.OtpVerification;
 import com.bluemoon.bluemoonedtech.otp.enums.OtpPurpose;
 import com.bluemoon.bluemoonedtech.otp.repository.OtpVerificationRepository;
@@ -30,7 +32,7 @@ public class EmailChangeService {
 
         if (userRepository.existsByEmail(newEmail)) {
             log.warn("Email change failed: email already in use");
-            throw new RuntimeException("Email already in use");
+            throw new ConflictException("Email already in use");
         }
 
         // 2. Generate OTP for EMAIL_CHANGE
@@ -56,7 +58,7 @@ public class EmailChangeService {
         );
         log.info("Email change OTP verified successfully");
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         log.info("User is successfully verified");
 
         log.info("Confirming email change");
@@ -65,7 +67,7 @@ public class EmailChangeService {
                         newEmail,
                         OtpPurpose.EMAIL_CHANGE
                 )
-                .orElseThrow(() -> new RuntimeException("OTP not verified"));
+                .orElseThrow(() -> new InvalidOtpException("OTP not verified"));
 
         // Update email
 
