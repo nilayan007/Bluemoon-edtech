@@ -24,7 +24,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtUtils jwtUtils, CustomUserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtUtils jwtUtils,
+                                   CustomUserDetailsService userDetailsService) {
         this.jwtUtils = jwtUtils;
         this.userDetailsService = userDetailsService;
     }
@@ -39,20 +40,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         String token = null;
 
+        //  Extract token
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         }
 
-        if (token != null
-                && jwtUtils.validateToken(token)
-                && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            //  Validate and authenticate
+            if (token != null
+                    && jwtUtils.validateToken(token)
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            String subject = jwtUtils.getSubject(token); // publicId (UUID)
+                String subject = jwtUtils.getSubject(token); // publicId or username
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(subject);
 
-            if (userDetails != null) {
-
+                // 🔹 Add userId to logs (MDC)
                 MDC.put(USER_ID, subject);
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -66,12 +70,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
+                // Set authentication
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
-                log.debug("JWT authentication successful");
+                log.debug("JWT authentication successful for user: {}", subject);
             }
+
+        } catch (Exception e) {
+            log.error("JWT authentication failed: {}", e.getMessage());
+        } finally {
+            //  VERY IMPORTANT: clear MDC to prevent leakage
+            MDC.remove(USER_ID);
         }
 
+        // Continue filter chain
         filterChain.doFilter(request, response);
     }
 }

@@ -9,6 +9,5 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
 
     List<Lesson> findByCourseIdOrderByOrderIndexAsc(Long courseId);
     boolean existsByCourseIdAndOrderIndex(Long courseId, int orderIndex);
-
 }
 

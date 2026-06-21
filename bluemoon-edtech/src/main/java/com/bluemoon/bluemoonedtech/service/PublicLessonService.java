@@ -18,16 +18,16 @@ public class PublicLessonService {
 
     public List<LessonResponseDTO> getLessonsByCourse(Long courseId) {
 
-        // 1️⃣ Fetch course
+        // 1 Fetch course
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        // 2️⃣ Check published status
+        // 2️ Check published status
         if (!course.isPublished()) {
             throw new RuntimeException("Course not published");
         }
 
-        // 3️⃣ Fetch lessons only if course is published
+        // 3️ Fetch lessons only if course is published
         return lessonRepository.findByCourseIdOrderByOrderIndexAsc(courseId)
                 .stream()
                 .map(lesson -> LessonResponseDTO.builder()

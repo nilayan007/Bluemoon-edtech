@@ -54,10 +54,10 @@ public class EmailChangeService {
                 otp,
                 OtpPurpose.EMAIL_CHANGE
         );
-        //log.info("Email change OTP verified successfully");
+        log.info("Email change OTP verified successfully");
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        log.info("Email change OTP is successfully verified");
+        log.info("User is successfully verified");
 
         log.info("Confirming email change");
         OtpVerification otp1 = otpRepository
@@ -81,10 +81,7 @@ public class EmailChangeService {
 
     }
 
-    public void confirmEmailChange(Long userId, String newEmail) {
 
-
-    }
 
 
 }

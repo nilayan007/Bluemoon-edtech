@@ -37,32 +37,28 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**"
-                        ).permitAll()
-                        // Public auth & health APIs
-                        .requestMatchers(
-                                "/api/health",
-                                "/api/auth/register",
-                                "/api/auth/login",
-                                "/api/auth/forgot-password",
-                                "/api/auth/verify-forgot-otp",
-                                "/api/auth/reset-password",
-                                "/api/auth/refresh",
-                                "/api/auth/logout"
-                        ).permitAll()
 
-                        // Public course APIs (GET only)
-                        .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
+                .requestMatchers(
+                        "/swagger-ui.html",
+                        "/swagger-ui/**",
+                        "/v3/api-docs/**"
+                ).permitAll()
 
-                        // Admin-only APIs
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/auth/**").permitAll()
 
-                        // Everything else
-                        .anyRequest().authenticated()
-                );
+                .requestMatchers("/api/health").permitAll()
+
+                // Public courses
+                .requestMatchers(HttpMethod.GET, "/courses/**").permitAll()
+
+                // User APIs
+                .requestMatchers("/user/**").authenticated()
+
+                // Admin APIs
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                .anyRequest().authenticated()
+        );
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

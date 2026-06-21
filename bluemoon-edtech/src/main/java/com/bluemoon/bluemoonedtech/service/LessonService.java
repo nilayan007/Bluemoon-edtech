@@ -1,28 +1,39 @@
 package com.bluemoon.bluemoonedtech.service;
 
 import com.bluemoon.bluemoonedtech.dto.AddLessonRequest;
+import com.bluemoon.bluemoonedtech.dto.LessonResponseDTO;
 import com.bluemoon.bluemoonedtech.dto.UpdateLessonRequest;
 import com.bluemoon.bluemoonedtech.entity.Course;
 import com.bluemoon.bluemoonedtech.entity.Lesson;
 import com.bluemoon.bluemoonedtech.repository.CourseRepository;
 import com.bluemoon.bluemoonedtech.repository.LessonRepository;
+import com.bluemoon.bluemoonedtech.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LessonService {
 
     private final CourseRepository courseRepository;
     private final LessonRepository lessonRepository;
+    private final EnrollmentService enrollmentService;
 
-    public Lesson addLesson(Long courseId, AddLessonRequest request) {
+    // Add Lesson
+    public LessonResponseDTO addLesson(Long courseId, AddLessonRequest request) {
+
         if (request.getOrderIndex() <= 0) {
             throw new IllegalArgumentException("orderIndex must be >= 1");
         }
 
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
+
         boolean orderIndexExists =
                 lessonRepository.existsByCourseIdAndOrderIndex(
                         courseId, request.getOrderIndex());
@@ -40,18 +51,24 @@ public class LessonService {
                 .course(course)
                 .build();
 
-        return lessonRepository.save(lesson);
+        Lesson saved = lessonRepository.save(lesson);
+        return mapToDTO(saved);
     }
 
+    // Delete Lesson
     public void deleteLesson(Long lessonId) {
-        lessonRepository.deleteById(lessonId);
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+
+        lessonRepository.delete(lesson);
     }
-    public Lesson updateLesson(Long lessonId, UpdateLessonRequest request) {
+
+    // Update Lesson
+    public LessonResponseDTO updateLesson(Long lessonId, UpdateLessonRequest request) {
 
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));
 
-        // ONLY validate orderIndex IF admin wants to change it
         if (request.getOrderIndex() != null) {
 
             if (request.getOrderIndex() <= 0) {
@@ -64,7 +81,6 @@ public class LessonService {
                             request.getOrderIndex()
                     );
 
-            // prevent collision with OTHER lessons
             if (exists && request.getOrderIndex() != lesson.getOrderIndex()) {
                 throw new IllegalArgumentException(
                         "Lesson with this orderIndex already exists in this course"
@@ -74,7 +90,6 @@ public class LessonService {
             lesson.setOrderIndex(request.getOrderIndex());
         }
 
-        // title update is totally independent
         if (request.getTitle() != null) {
             lesson.setTitle(request.getTitle());
         }
@@ -83,7 +98,43 @@ public class LessonService {
             lesson.setVideoUrl(request.getVideoUrl());
         }
 
-        return lessonRepository.save(lesson);
+        Lesson updated = lessonRepository.save(lesson);
+        return mapToDTO(updated);
     }
 
+    // Get lessons by course
+    public List<LessonResponseDTO> getLessonsByCourse(Long courseId) {
+
+        Long userId = getCurrentUserId(); // from JWT
+
+        boolean hasAccess = enrollmentService.hasActiveEnrollment(userId, courseId);
+
+        if (!hasAccess) {
+            throw new RuntimeException("Access denied");
+        }
+
+        List<Lesson> lessons = lessonRepository
+                .findByCourseIdOrderByOrderIndexAsc(courseId);
+
+        return lessons.stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+
+    // Mapping method
+    private LessonResponseDTO mapToDTO(Lesson lesson) {
+        return LessonResponseDTO.builder()
+                .id(lesson.getId())
+                .title(lesson.getTitle())
+                .videoUrl(lesson.getVideoUrl())
+                .orderIndex(lesson.getOrderIndex())
+                .build();
+    }
+    private Long getCurrentUserId() {
+        return ((CustomUserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal())
+                .getId();
+    }
 }

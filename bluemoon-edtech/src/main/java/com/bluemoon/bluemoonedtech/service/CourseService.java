@@ -1,19 +1,25 @@
 package com.bluemoon.bluemoonedtech.service;
 
+import com.bluemoon.bluemoonedtech.dto.CourseResponseDTO;
 import com.bluemoon.bluemoonedtech.dto.CreateCourseRequest;
 import com.bluemoon.bluemoonedtech.dto.UpdateCourseRequest;
 import com.bluemoon.bluemoonedtech.entity.Course;
 import com.bluemoon.bluemoonedtech.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    public Course createCourse(CreateCourseRequest request) {
+    // Create Course
+    public CourseResponseDTO createCourse(CreateCourseRequest request) {
         Course course = Course.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -21,16 +27,28 @@ public class CourseService {
                 .published(false)
                 .build();
 
-        return courseRepository.save(course);
+        Course saved = courseRepository.save(course);
+        return mapToDTO(saved);
     }
 
-    public void deleteCourse(Long courseId) {
+    // et ALL courses (admin)
+    public List<CourseResponseDTO> getAllCourses() {
+        return courseRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+
+    // Get course by ID
+    public CourseResponseDTO getCourseById(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        courseRepository.delete(course);
+        return mapToDTO(course);
     }
-    public Course updateCourse(Long courseId, UpdateCourseRequest request) {
+
+    // Update course
+    public CourseResponseDTO updateCourse(Long courseId, UpdateCourseRequest request) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
@@ -47,24 +65,43 @@ public class CourseService {
             course.setPublished(request.getPublished());
         }
 
-        return courseRepository.save(course);
+        Course updated = courseRepository.save(course);
+        return mapToDTO(updated);
     }
-    public Course publishCourse(Long courseId) {
 
+    // Delete course
+    public void deleteCourse(Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        courseRepository.delete(course);
+    }
+
+    // Publish
+    public CourseResponseDTO publishCourse(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
         course.setPublished(true);
-        return courseRepository.save(course);
+        return mapToDTO(courseRepository.save(course));
     }
 
-    public Course unpublishCourse(Long courseId) {
-
+    // Unpublish
+    public CourseResponseDTO unpublishCourse(Long courseId) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
         course.setPublished(false);
-        return courseRepository.save(course);
+        return mapToDTO(courseRepository.save(course));
     }
 
+    // Mapping method
+    private CourseResponseDTO mapToDTO(Course course) {
+        return CourseResponseDTO.builder()
+                .id(course.getId())
+                .title(course.getTitle())
+                .description(course.getDescription())
+                .thumbnailUrl(course.getThumbnailUrl())
+                .build();
+    }
 }
