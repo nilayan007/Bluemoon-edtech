@@ -5,8 +5,12 @@ import com.bluemoon.bluemoonedtech.security.CustomUserDetails;
 import com.bluemoon.bluemoonedtech.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,34 +21,19 @@ public class EnrollmentController {
 
     private final EnrollmentService enrollmentService;
 
-    // 🔐 Get current user ID from JWT
-    private Long getCurrentUserId() {
-        return ((CustomUserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal())
-                .getId();
-    }
-
-    // Request access
     @PostMapping("/courses/{courseId}/request-access")
-    public ResponseEntity<?> requestAccess(@PathVariable Long courseId) {
-
-        Long userId = getCurrentUserId();
-
-        enrollmentService.requestAccess(userId, courseId);
-
+    public ResponseEntity<?> requestAccess(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable Long courseId
+    ) {
+        enrollmentService.requestAccess(user.getId(), courseId);
         return ResponseEntity.ok("Access request sent");
     }
 
-    // My Courses
     @GetMapping("/my-courses")
-    public ResponseEntity<List<CourseResponseDTO>> getMyCourses() {
-
-        Long userId = getCurrentUserId();
-
-        return ResponseEntity.ok(
-                enrollmentService.getMyCourses(userId)
-        );
+    public ResponseEntity<List<CourseResponseDTO>> getMyCourses(
+            @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        return ResponseEntity.ok(enrollmentService.getMyCourses(user.getId()));
     }
 }

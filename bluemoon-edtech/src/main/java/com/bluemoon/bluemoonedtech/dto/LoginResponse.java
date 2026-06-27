@@ -1,4 +1,5 @@
 package com.bluemoon.bluemoonedtech.dto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Builder;
 @Builder
@@ -9,5 +10,6 @@ public class LoginResponse {
     private String email;
     private boolean verified;
     private String accessToken;
+    @JsonIgnore
     private String refreshToken;
 }
