@@ -29,4 +29,13 @@ public class AdminEnrollmentController {
 
         return ResponseEntity.ok("Enrollment approved");
     }
+
+    //  Reject enrollment
+    @PutMapping("/{enrollmentId}/reject")
+    public ResponseEntity<?> reject(@PathVariable Long enrollmentId) {
+
+        enrollmentService.rejectEnrollment(enrollmentId);
+
+        return ResponseEntity.ok("Enrollment rejected");
+    }
 }

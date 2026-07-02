@@ -65,6 +65,19 @@ public class EnrollmentService {
         enrollment.setExpiryDate(LocalDateTime.now().plusDays(30));
     }
 
+    //  Admin rejects
+    public void rejectEnrollment(Long enrollmentId) {
+
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Enrollment not found"));
+
+        if (enrollment.getStatus() != EnrollmentStatus.PENDING) {
+            throw new ConflictException("Only pending enrollments can be rejected");
+        }
+
+        enrollment.setStatus(EnrollmentStatus.REJECTED);
+    }
+
     // My Courses (ACTIVE only)
     public List<CourseResponseDTO> getMyCourses(Long userId) {
         return enrollmentRepository

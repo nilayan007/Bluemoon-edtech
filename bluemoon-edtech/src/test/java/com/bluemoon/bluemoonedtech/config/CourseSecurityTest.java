@@ -7,6 +7,8 @@ import com.bluemoon.bluemoonedtech.security.CustomUserDetailsService;
 import com.bluemoon.bluemoonedtech.security.JwtAuthenticationEntryPoint;
 import com.bluemoon.bluemoonedtech.security.JwtAuthenticationFilter;
 import com.bluemoon.bluemoonedtech.security.JwtUtils;
+import com.bluemoon.bluemoonedtech.security.ratelimit.RateLimiterService;
+import com.bluemoon.bluemoonedtech.security.ratelimit.RateLimitingFilter;
 import com.bluemoon.bluemoonedtech.service.PublicCourseService;
 import com.bluemoon.bluemoonedtech.service.PublicLessonService;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import({
         SecurityConfig.class,
         JwtAuthenticationFilter.class,
-        JwtAuthenticationEntryPoint.class
+        JwtAuthenticationEntryPoint.class,
+        RateLimitingFilter.class,
+        RateLimiterService.class
 })
 class CourseSecurityTest {
 

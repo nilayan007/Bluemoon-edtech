@@ -3,6 +3,7 @@ package com.bluemoon.bluemoonedtech.config;
 import com.bluemoon.bluemoonedtech.security.CustomUserDetailsService;
 import com.bluemoon.bluemoonedtech.security.JwtAuthenticationEntryPoint;
 import com.bluemoon.bluemoonedtech.security.JwtAuthenticationFilter;
+import com.bluemoon.bluemoonedtech.security.ratelimit.RateLimitingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +35,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final RateLimitingFilter rateLimitingFilter;
 
 
     @Bean
@@ -70,6 +72,7 @@ public class SecurityConfig {
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(rateLimitingFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
