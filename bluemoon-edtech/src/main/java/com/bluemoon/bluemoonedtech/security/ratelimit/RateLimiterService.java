@@ -3,7 +3,7 @@ package com.bluemoon.bluemoonedtech.security.ratelimit;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Refill;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
  * Single-instance only: if this app ever runs behind multiple nodes, swap the
  * backing map for Bucket4j's Redis/Hazelcast proxy manager so all nodes share state.
  */
-@Component
+@Service
 public class RateLimiterService {
 
     private final ConcurrentMap<String, Bucket> buckets = new ConcurrentHashMap<>();
