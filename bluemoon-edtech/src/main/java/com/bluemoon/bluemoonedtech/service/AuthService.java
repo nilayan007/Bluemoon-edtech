@@ -41,7 +41,7 @@ public class AuthService {
 
         log.info("User authenticated successfully");
 
-        String accessToken = jwtUtils.generateToken(user.getPublicId());
+        String accessToken = jwtUtils.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.create(user);
 
         log.info("Access and refresh tokens generated successfully");
@@ -66,7 +66,7 @@ public class AuthService {
         User user = refreshToken.getUser();
 
         String newAccessToken =
-                jwtUtils.generateToken(user.getPublicId());
+                jwtUtils.generateToken(user);
 
         log.info("New access token generated successfully");
 

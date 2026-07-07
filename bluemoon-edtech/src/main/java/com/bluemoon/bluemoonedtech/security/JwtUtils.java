@@ -1,4 +1,5 @@
 package com.bluemoon.bluemoonedtech.security;
+import com.bluemoon.bluemoonedtech.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -34,11 +35,14 @@ public class JwtUtils {
     }
 
 
-    public String generateToken(String subject) {
+    public String generateToken(User user) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(user.getPublicId())
+                .claim("role", user.getRole().name())
+                .claim("name", user.getName())
+                .claim("email", user.getEmail())
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(key, SignatureAlgorithm.HS256)
